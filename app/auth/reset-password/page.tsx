@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import axios from 'axios'
 
@@ -20,18 +20,41 @@ export default function ResetPasswordPage() {
   const [isValidToken, setIsValidToken] = useState(false)
   const [checkingToken, setCheckingToken] = useState(true)
   const router = useRouter()
-  const searchParams = useSearchParams()
 
   useEffect(() => {
-    // Check if we have the necessary tokens from the URL
-    const accessToken = searchParams.get('access_token')
-    const refreshToken = searchParams.get('refresh_token')
+    // Parse URL hash fragments (Supabase sends tokens in URL hash, not query params)
+    const parseUrlHash = () => {
+      if (typeof window === 'undefined') return {}
+      
+      const hash = window.location.hash.slice(1) // Remove the # symbol
+      if (!hash) return {}
+      
+      const hashParts = hash.split('&')
+      const hashMap: Record<string, string> = {}
+      
+      hashParts.forEach(part => {
+        const [name, value] = part.split('=')
+        if (name && value) {
+          hashMap[name] = decodeURIComponent(value)
+        }
+      })
+      
+      return hashMap
+    }
+
+    const hashParams = parseUrlHash()
+    const accessToken = hashParams.access_token
+    const refreshToken = hashParams.refresh_token
+    const type = hashParams.type
     
-    if (accessToken && refreshToken) {
+    if (accessToken && refreshToken && type === 'recovery') {
       // Store tokens temporarily for password reset
       sessionStorage.setItem('reset_access_token', accessToken)
       sessionStorage.setItem('reset_refresh_token', refreshToken)
       setIsValidToken(true)
+      
+      // Clear the hash from URL for security
+      window.history.replaceState(null, '', window.location.pathname)
     } else {
       // Check if tokens are already in session storage
       const storedAccessToken = sessionStorage.getItem('reset_access_token')
@@ -42,7 +65,7 @@ export default function ResetPasswordPage() {
       }
     }
     setCheckingToken(false)
-  }, [searchParams])
+  }, [])
 
   const validateForm = () => {
     if (newPassword !== confirmPassword) {
@@ -69,19 +92,18 @@ export default function ResetPasswordPage() {
 
     try {
       const accessToken = sessionStorage.getItem('reset_access_token')
+      const refreshToken = sessionStorage.getItem('reset_refresh_token')
       
-      if (!accessToken) {
+      if (!accessToken || !refreshToken) {
         setError('Session expired. Please request a new password reset.')
         setLoading(false)
         return
       }
 
       const response = await axios.post<AuthResponse>('/api/auth/reset-password', {
-        new_password: newPassword
-      }, {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
+        new_password: newPassword,
+        access_token: accessToken,
+        refresh_token: refreshToken
       })
       
       if (response.data.success) {

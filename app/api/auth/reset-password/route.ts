@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 
 interface ResetPasswordRequest {
   new_password: string
+  access_token: string
+  refresh_token: string
 }
 
 interface AuthResponse {
@@ -13,18 +15,15 @@ interface AuthResponse {
 export async function POST(request: NextRequest) {
   try {
     const body: ResetPasswordRequest = await request.json()
-    const { new_password } = body
+    const { new_password, access_token, refresh_token } = body
 
-    // Get the authorization header
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    // Validate tokens
+    if (!access_token || !refresh_token) {
       return NextResponse.json(
-        { success: false, message: 'Authorization token required' },
+        { success: false, message: 'Access token and refresh token are required' },
         { status: 401 }
       )
     }
-
-    const accessToken = authHeader.substring(7) // Remove 'Bearer ' prefix
 
     // Validate input
     if (!new_password) {
@@ -42,17 +41,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Get backend URL from environment
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000'
     
     // Make request to backend
-    const response = await fetch(`${backendUrl}/auth/reset-password`, {
+    const response = await fetch(`${backendUrl}/api/auth/reset-password`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        new_password: new_password
+        new_password: new_password,
+        access_token: access_token,
+        refresh_token: refresh_token
       })
     })
 
