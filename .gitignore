@@ -215,3 +215,7 @@ Thumbs.db
 # Logs
 logs
 *.log
+
+# Backend directory (now a separate repo)
+backend/
+backend copy/
