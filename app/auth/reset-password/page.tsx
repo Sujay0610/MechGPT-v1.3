@@ -210,7 +210,7 @@ export default function ResetPasswordPage() {
 
           <button
             type="submit"
-            disabled={loading || success}
+            disabled={loading === true || success !== ''}
             className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Resetting Password...' : success ? 'Redirecting to Login...' : 'Reset Password'}
