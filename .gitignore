@@ -218,4 +218,4 @@ logs
 
 # Backend directory (now a separate repo)
 backend/
-backend copy/
+backendcopy/
