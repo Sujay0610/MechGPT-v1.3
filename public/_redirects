@@ -1,0 +1,8 @@
+# Handle client-side routing for Next.js
+/*    /index.html   200
+
+# Handle auth routes specifically
+/auth/*    /index.html   200
+
+# API routes should go to your backend
+/api/*    https://mechgpt-nxzmb.ondigitalocean.app/api/:splat   200
