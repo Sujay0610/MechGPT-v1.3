@@ -24,7 +24,8 @@ The current issue is that the password reset link in emails is pointing to a 404
 
 ### Template Settings:
 - **Subject**: `Reset your MechAgent password`
-- **Redirect URL**: `http://localhost:3000/auth/reset-password`
+- **Redirect URL (Production)**: `https://mechgptv1.netlify.app/auth/reset-password`
+- **Redirect URL (Development)**: `http://localhost:3000/auth/reset-password`
 
 ### HTML Template:
 ```html
@@ -153,7 +154,8 @@ The current issue is that the password reset link in emails is pointing to a 404
 
 ### Template Settings:
 - **Subject**: `Confirm your MechAgent email`
-- **Redirect URL**: `http://localhost:3000/auth/login`
+- **Redirect URL (Production)**: `https://mechgptv1.netlify.app/auth/login`
+- **Redirect URL (Development)**: `http://localhost:3000/auth/login`
 
 ### HTML Template:
 ```html
@@ -267,9 +269,20 @@ The current issue is that the password reset link in emails is pointing to a 404
 
 ## Step 5: Configure Site URL Settings
 
+### For Production
+1. In the Authentication settings, find **Site URL**
+2. Set it to: `https://mechgptv1.netlify.app`
+3. In **Redirect URLs**, add:
+   - `https://mechgptv1.netlify.app/`
+   - `https://mechgptv1.netlify.app/auth/login`
+   - `https://mechgptv1.netlify.app/auth/reset-password`
+   - `https://mechgptv1.netlify.app/auth/signup`
+
+### For Local Development
 1. In the Authentication settings, find **Site URL**
 2. Set it to: `http://localhost:3000`
 3. In **Redirect URLs**, add:
+   - `http://localhost:3000/`
    - `http://localhost:3000/auth/reset-password`
    - `http://localhost:3000/auth/login`
    - `http://localhost:3000/auth/signup`
@@ -304,6 +317,16 @@ When deploying to production, update the following:
 ## Environment Variables Summary
 
 Make sure these are set in your `.env` file:
+
+### For Production:
+```
+FRONTEND_URL=https://mechgptv1.netlify.app
+SUPABASE_URL=https://mcxpwhdfnoivfiujquaq.supabase.co
+SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
+
+### For Local Development:
 ```
 FRONTEND_URL=http://localhost:3000
 SUPABASE_URL=https://mcxpwhdfnoivfiujquaq.supabase.co

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import axios from 'axios'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -62,6 +63,7 @@ function ChatPage() {
   } = useChat()
 
   const { user } = useAuth()
+  const router = useRouter()
 
   // Helper function to get auth headers
   const getAuthHeaders = () => {
@@ -92,7 +94,41 @@ function ChatPage() {
   const [deleting, setDeleting] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
+  // Handle Supabase authentication redirects
   useEffect(() => {
+    const handleSupabaseAuth = () => {
+      if (typeof window !== 'undefined') {
+        const hashParams = new URLSearchParams(window.location.hash.substring(1))
+        const accessToken = hashParams.get('access_token')
+        const refreshToken = hashParams.get('refresh_token')
+        const type = hashParams.get('type')
+        const error = hashParams.get('error')
+        const errorDescription = hashParams.get('error_description')
+
+        if (error) {
+          console.error('Supabase auth error:', error, errorDescription)
+          router.push('/auth/login?error=' + encodeURIComponent(errorDescription || error))
+          return
+        }
+
+        if (accessToken && type) {
+          // Clear the hash from URL
+          window.history.replaceState(null, '', window.location.pathname)
+          
+          if (type === 'recovery') {
+            // Password reset - redirect to reset password page
+            router.push('/auth/reset-password#' + window.location.hash.substring(1))
+            return
+          } else if (type === 'signup') {
+            // Email confirmation - redirect to login with success message
+            router.push('/auth/login?confirmed=true')
+            return
+          }
+        }
+      }
+    }
+
+    handleSupabaseAuth()
     fetchAgents()
   }, [])
 
