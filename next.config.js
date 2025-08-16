@@ -12,10 +12,6 @@ const nextConfig = {
         source: '/api/chat/:path*',
         destination: 'http://127.0.0.1:8000/api/chat/:path*',
       },
-      {
-        source: '/api/agents/:agentName/upload/status/:jobId',
-        destination: 'http://127.0.0.1:8000/api/agents/:agentName/upload/status/:jobId',
-      },
     ]
   },
   // Add experimental features for better proxy handling
