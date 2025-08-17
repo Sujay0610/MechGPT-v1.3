@@ -1282,7 +1282,12 @@ function ChatPage() {
               </h3>
               <button
                 onClick={() => setShowUploadStatus(false)}
-                className="text-gray-400 hover:text-gray-200 text-sm hover:bg-gray-700 rounded p-1"
+                disabled={uploading}
+                className={`text-sm rounded p-1 ${
+                  uploading 
+                    ? 'text-gray-600 cursor-not-allowed opacity-50' 
+                    : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700'
+                }`}
               >
                 ✕
               </button>
