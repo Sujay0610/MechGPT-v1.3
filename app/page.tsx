@@ -10,6 +10,9 @@ import { useAuth } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import MainLayout from './components/MainLayout'
 
+// Add backend URL configuration
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://api.aigentsify.com'
+
 interface Message {
   id: string
   text: string
@@ -282,7 +285,8 @@ function ChatPage() {
     
     const poll = async (): Promise<void> => {
       try {
-        const response = await axios.get(`/api/agents/${agentName}/upload/status/${jobId}`, {
+        // Call backend directly instead of Netlify proxy
+        const response = await axios.get(`${BACKEND_URL}/api/agents/${agentName}/upload/status/${jobId}`, {
           headers: getAuthHeaders()
         })
         const status = response.data
@@ -370,8 +374,9 @@ function ChatPage() {
         formData.append('files', file)
       })
       
+      // Call backend directly instead of Netlify proxy
       const response = await axios.post(
-        `/api/agents/${selectedAgent.name}/upload`,
+        `${BACKEND_URL}/api/agents/${selectedAgent.name}/upload`,
         formData,
         {
           headers: {
@@ -428,8 +433,9 @@ function ChatPage() {
     setUploadResult('')
     
     try {
+      // Call backend directly instead of Netlify proxy
       const response = await axios.post(
-        `/api/agents/${selectedAgent.name}/upload-text`,
+        `${BACKEND_URL}/api/agents/${selectedAgent.name}/upload-text`,
         {
           content: textContent,
           title: textTitle || 'Text Content'
@@ -488,8 +494,9 @@ function ChatPage() {
     try {
       const urls = linkUrls.split('\n').filter(url => url.trim())
       
+      // Call backend directly instead of Netlify proxy
       const response = await axios.post(
-        `/api/agents/${selectedAgent.name}/upload-links`,
+        `${BACKEND_URL}/api/agents/${selectedAgent.name}/upload-links`,
         { urls },
         {
           headers: getAuthHeaders()
