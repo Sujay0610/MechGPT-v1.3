@@ -277,6 +277,7 @@ function ChatPage() {
   const [uploadProgress, setUploadProgress] = useState('')
   const [uploadResult, setUploadResult] = useState('')
   const [showUploadStatus, setShowUploadStatus] = useState(false)
+  const [showUploadDetails, setShowUploadDetails] = useState(false)
   const [uploadingAgent, setUploadingAgent] = useState<string | null>(null)
 
   const pollJobStatus = async (jobId: string, agentName: string) => {
@@ -313,6 +314,7 @@ function ChatPage() {
           // Hide upload status after 8 seconds
           setTimeout(() => {
             setShowUploadStatus(false)
+            setShowUploadDetails(false)
             setUploadProgress('')
             setUploadResult('')
           }, 8000)
@@ -327,6 +329,7 @@ function ChatPage() {
           // Hide upload status after 12 seconds for errors
           setTimeout(() => {
             setShowUploadStatus(false)
+            setShowUploadDetails(false)
             setUploadProgress('')
             setUploadResult('')
           }, 12000)
@@ -350,6 +353,7 @@ function ChatPage() {
         
         setTimeout(() => {
           setShowUploadStatus(false)
+          setShowUploadDetails(false)
           setUploadProgress('')
           setUploadResult('')
         }, 10000)
@@ -405,6 +409,7 @@ function ChatPage() {
         
         setTimeout(() => {
           setShowUploadStatus(false)
+          setShowUploadDetails(false)
           setUploadProgress('')
           setUploadResult('')
         }, 5000)
@@ -417,6 +422,7 @@ function ChatPage() {
       
       setTimeout(() => {
         setShowUploadStatus(false)
+        setShowUploadDetails(false)
         setUploadProgress('')
         setUploadResult('')
       }, 10000)
@@ -464,6 +470,7 @@ function ChatPage() {
         
         setTimeout(() => {
           setShowUploadStatus(false)
+          setShowUploadDetails(false)
           setUploadProgress('')
           setUploadResult('')
         }, 5000)
@@ -476,6 +483,7 @@ function ChatPage() {
       
       setTimeout(() => {
         setShowUploadStatus(false)
+        setShowUploadDetails(false)
         setUploadProgress('')
         setUploadResult('')
       }, 10000)
@@ -521,6 +529,7 @@ function ChatPage() {
         
         setTimeout(() => {
           setShowUploadStatus(false)
+          setShowUploadDetails(false)
           setUploadProgress('')
           setUploadResult('')
         }, 5000)
@@ -533,6 +542,7 @@ function ChatPage() {
       
       setTimeout(() => {
         setShowUploadStatus(false)
+        setShowUploadDetails(false)
         setUploadProgress('')
         setUploadResult('')
       }, 10000)
@@ -1279,54 +1289,97 @@ function ChatPage() {
         </div>
       )}
 
-      {/* Upload Status Popup */}
+      {/* Upload Progress Bar */}
       {showUploadStatus && (
-        <div className="fixed bottom-4 right-4 bg-gray-900 border border-gray-600 rounded-lg shadow-2xl z-40 w-96 max-w-sm">
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-gray-100">
-                Processing - {uploadingAgent}
-              </h3>
-              <button
-                onClick={() => setShowUploadStatus(false)}
-                disabled={uploading}
-                className={`text-sm rounded p-1 ${
-                  uploading 
-                    ? 'text-gray-600 cursor-not-allowed opacity-50' 
-                    : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700'
-                }`}
-              >
-                ✕
-              </button>
+        <div className="fixed top-20 right-4 z-40">
+          {/* Compact Progress Bar */}
+          <div 
+            onClick={() => setShowUploadDetails(!showUploadDetails)}
+            className="bg-gray-900 border border-gray-600 rounded-lg shadow-lg cursor-pointer hover:bg-gray-800 transition-colors p-3 min-w-64"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                {uploading && (
+                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-500"></div>
+                )}
+                <span className="text-xs text-gray-100 font-medium">
+                  {uploading ? `Processing - ${uploadingAgent}` : uploadResult ? 'Completed' : 'Upload Status'}
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="text-xs text-gray-400">
+                  {showUploadDetails ? '▼' : '▶'}
+                </span>
+                {!uploading && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setShowUploadStatus(false)
+                      setShowUploadDetails(false)
+                    }}
+                    className="text-gray-400 hover:text-gray-200 text-sm"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
             </div>
             
-            {uploading && (
-              <div className="flex items-center space-x-2 mb-3">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-                <span className="text-xs text-blue-300 font-medium">Processing...</span>
-              </div>
-            )}
-            
-            {uploadProgress && (
-              <div className="mb-3">
-                <div className="text-xs text-gray-200 whitespace-pre-line bg-gray-800 p-3 rounded border border-gray-700 max-h-40 overflow-y-auto font-mono">
-                  {uploadProgress}
-                </div>
-              </div>
-            )}
-            
-            {uploadResult && (
-              <div className="mb-2">
-                <div className={`text-xs p-3 rounded border font-medium ${
-                  uploadResult.includes('failed') || uploadResult.includes('error') 
-                    ? 'bg-red-900 border-red-600 text-red-200' 
-                    : 'bg-green-900 border-green-600 text-green-200'
-                }`}>
-                  {uploadResult}
+            {/* Progress indicator */}
+            {uploading && uploadProgress && (
+              <div className="mt-2">
+                <div className="w-full bg-gray-700 rounded-full h-1.5">
+                  <div className="bg-blue-500 h-1.5 rounded-full animate-pulse" style={{width: '60%'}}></div>
                 </div>
               </div>
             )}
           </div>
+          
+          {/* Detailed Popup */}
+          {showUploadDetails && (
+            <div className="mt-2 bg-gray-900 border border-gray-600 rounded-lg shadow-2xl w-96 max-w-sm">
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-gray-100">
+                    Processing Details - {uploadingAgent}
+                  </h3>
+                  <button
+                    onClick={() => setShowUploadDetails(false)}
+                    className="text-gray-400 hover:text-gray-200 hover:bg-gray-700 text-sm rounded p-1"
+                  >
+                    ✕
+                  </button>
+                </div>
+                
+                {uploading && (
+                  <div className="flex items-center space-x-2 mb-3">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                    <span className="text-xs text-blue-300 font-medium">Processing...</span>
+                  </div>
+                )}
+                
+                {uploadProgress && (
+                  <div className="mb-3">
+                    <div className="text-xs text-gray-200 whitespace-pre-line bg-gray-800 p-3 rounded border border-gray-700 max-h-40 overflow-y-auto font-mono">
+                      {uploadProgress}
+                    </div>
+                  </div>
+                )}
+                
+                {uploadResult && (
+                  <div className="mb-2">
+                    <div className={`text-xs p-3 rounded border font-medium ${
+                      uploadResult.includes('failed') || uploadResult.includes('error') 
+                        ? 'bg-red-900 border-red-600 text-red-200' 
+                        : 'bg-green-900 border-green-600 text-green-200'
+                    }`}>
+                      {uploadResult}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
