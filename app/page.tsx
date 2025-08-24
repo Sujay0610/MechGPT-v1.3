@@ -11,7 +11,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import MainLayout from './components/MainLayout'
 
 // Add backend URL configuration
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://api.aigentsify.com'
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
 
 interface Message {
   id: string
@@ -441,7 +441,7 @@ function ChatPage() {
     try {
       // Call backend directly instead of Netlify proxy
       const response = await axios.post(
-        `${BACKEND_URL}/api/agents/${selectedAgent.name}/upload-text`,
+        `${BACKEND_URL}/api/agents/${selectedAgent.name}/text`,
         {
           content: textContent,
           title: textTitle || 'Text Content'
@@ -504,7 +504,7 @@ function ChatPage() {
       
       // Call backend directly instead of Netlify proxy
       const response = await axios.post(
-        `${BACKEND_URL}/api/agents/${selectedAgent.name}/upload-links`,
+        `${BACKEND_URL}/api/agents/${selectedAgent.name}/crawl`,
         { urls },
         {
           headers: getAuthHeaders()
